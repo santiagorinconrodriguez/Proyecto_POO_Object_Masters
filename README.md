@@ -15,8 +15,7 @@
 
 ## Diagrama de flujo:
 
-```
-mermaid
+``` mermaid
 
 classDiagram
     class Component {
@@ -162,6 +161,11 @@ classDiagram
     RLCParallel o-- Resistor
     RLCParallel o-- Capacitor
     RLCParallel o-- Inductor
-```
+``` 
 
 ## Interfaz gráfica:
+
+# Autores:
+- [Brayan Santiago Rincón Rodríguez](https://github.com/santiagorinconrodriguez)
+- [Nicolás Garzón Peña ](https://github.com/yoyomasterNGP)
+- [Diego Alejandro Henao Lara ](https://github.com/AlejoHenao8)
