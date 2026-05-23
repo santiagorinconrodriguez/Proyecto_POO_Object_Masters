@@ -1,15 +1,24 @@
 # Proyecto simulador de circuitos
 
-## kdjsjsnzsn:
+## Circuit simulator
 
 ## Introducción:
+
+Este proyecto consiste en el desarrollo de una aplicación en Python llamada circuit simulator para simular circuitos eléctricos RC, RL y RLC en configuraciones serie y paralelo, utilizando los conceptos de Programación Orientada a Objetos vistos en clase. El sistema representa componentes como resistencias, capacitores, inductores y fuentes de voltaje mediante clases, permitiendo organizar el programa de manera modular y reutilizable.
+
+La simulación se basa en las leyes de Kirchhoff y en la resolución numérica de ecuaciones diferenciales para analizar cómo cambian los voltajes y corrientes a lo largo del tiempo. Además, el programa permite el estudio del comportamiento transitorio de distintos circuitos eléctricos.
 
 ## Objetivos:
 
 ### *Objetivo general:*
 
+Desarrollar una aplicación en Python usando los conceptos de Programación Orientada a Objetos vistos en clase, que permitan simular y analizar el comportamiento transitorio de circuitos eléctricos RC, RL y RLC mediante métodos numéricos.
+
 ### *Objetivos específicos:*
 
+- Diseñar una arquitectura orientada a objetos para representar componentes eléctricos y topologías de circuitos.
+- Aplicar las leyes de Kirchhoff para obtener las ecuaciones diferenciales asociadas a cada circuito.
+- Aplicar principios de Programación Orientada a Objetos como herencia, encapsulamiento, abstracción y polimorfismo en el desarrollo del sistema.
 
 ## Lógica del programa:
 
