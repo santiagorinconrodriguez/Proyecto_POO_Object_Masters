@@ -4,7 +4,7 @@
 
 ## Introducción:
 
-Este proyecto consiste en el desarrollo de una aplicación en Python llamada circuit simulator para simular circuitos eléctricos RC, RL y RLC en configuraciones serie y paralelo, utilizando los conceptos de Programación Orientada a Objetos vistos en clase. El sistema representa componentes como resistencias, capacitores, inductores y fuentes de voltaje mediante clases, permitiendo organizar el programa de manera modular y reutilizable.
+Este proyecto consiste en el desarrollo de una aplicación en Python llamada circuit simulator para simular circuitos eléctricos RC, RL y RLC en configuraciones serie y paralelo utilizando los conceptos de Programación Orientada a Objetos. El sistema representa componentes ideales como resistencias, capacitores, inductores, interruptores y fuentes de voltaje DC mediante clases, permitiendo organizar el programa de manera modular y reutilizable.
 
 La simulación se basa en las leyes de Kirchhoff y en la resolución numérica de ecuaciones diferenciales para analizar cómo cambian los voltajes y corrientes a lo largo del tiempo. Además, el programa permite el estudio del comportamiento transitorio de distintos circuitos eléctricos.
 
@@ -12,7 +12,7 @@ La simulación se basa en las leyes de Kirchhoff y en la resolución numérica d
 
 ### *Objetivo general:*
 
-Desarrollar una aplicación en Python usando los conceptos de Programación Orientada a Objetos vistos en clase, que permitan simular y analizar el comportamiento transitorio de circuitos eléctricos RC, RL y RLC mediante métodos numéricos.
+Desarrollar una aplicación en Python usando los conceptos de Programación Orientada a Objetos, que permitan simular y analizar el comportamiento transitorio de circuitos eléctricos RC, RL y RLC.
 
 ### *Objetivos específicos:*
 
@@ -22,13 +22,13 @@ Desarrollar una aplicación en Python usando los conceptos de Programación Orie
 
 ## Lógica del programa:
 
-El simulador está estructurado en cinco módulos principales: componentes, fuentes, circuitos, simulación y visualización. Cada módulo agrupa las clases responsables de una etapa específica del proceso, desde la definición del circuito hasta la generación de gráficas.
+El simulador está estructurado en cinco módulos principales: componentes, circuitos, simulación y visualización. Cada módulo agrupa las clases responsables de una etapa específica del proceso, desde la definición del circuito hasta la generación de gráficas.
 
-El usuario comienza instanciando los componentes pasivos que conforman el circuito — resistencias, capacitores e inductores — junto con una fuente de tensión DC y un switch. Cada componente se crea con sus parámetros físicos (resistencia en ohms, capacitancia en faradios, etc.) y el switch define el instante en que el circuito se activa. Con estos objetos, el usuario instancia una topología predefinida — por ejemplo RCSeries o RLCParallel — que internamente asigna los nodos a cada componente de forma automática, sin que el usuario tenga que numerarlos manualmente.
+El usuario comienza instanciando los componentes pasivos que conforman el circuito: resistencias, capacitores e inductores, junto con una fuente de tensión DC y un interruptor. Cada componente se crea con sus parámetros físicos (resistencia en ohms, capacitancia en faradios, etc.) y el interruptor define el instante en que el circuito se activa. Con estos objetos, el usuario instancia una topología predefinida, por ejemplo, RC en serie o RC en paralelo.
 
-Una vez definido el circuito, se crea un Solver al que se le pasa la topología junto con los parámetros de simulación: tiempo de inicio, tiempo final e intervalo de tiempo. El solver construye internamente la matriz del sistema usando el método de Análisis Nodal Modificado (MNA), donde cada componente contribuye a la matriz según su naturaleza eléctrica a través del método stamp(). Para circuitos con capacitores o inductores, el sistema de ecuaciones se convierte en una ecuación diferencial ordinaria que el solver resuelve numéricamente paso a paso en el tiempo usando scipy. El resultado de la simulación se almacena en un objeto SimResult, que contiene los vectores de tiempo, voltaje y corriente para cada componente del circuito.
+Una vez definido el circuito, se soluciona teniendo en cuenta la topología junto con los parámetros de simulación: tiempo final e intervalo de tiempo. Se construye internamente la matriz del sistema usando el método de Análisis Nodal Modificado (MNA), donde cada componente contribuye a la matriz según su naturaleza eléctrica. Para circuitos con capacitores o inductores, el sistema de ecuaciones se convierte en una ecuación diferencial ordinaria que se resuelve numéricamente paso a paso en el tiempo. Con ayuda de la librería `matplotlib` el resultado de la simulación se almacena conteniendo tiempo, voltaje y corriente para cada componente del circuito.
 
-Finalmente, el Plotter recibe el SimResult y genera las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
+Finalmente, guarda en formato PNG las figuras de las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
 
 ## Diagrama de flujo:
 
