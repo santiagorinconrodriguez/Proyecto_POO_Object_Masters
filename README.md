@@ -4,7 +4,7 @@
 
 ## Introducción:
 
-Este proyecto consiste en el desarrollo de una aplicación en Python llamada circuit simulator para simular circuitos eléctricos RC, RL y RLC en configuraciones serie y paralelo utilizando los conceptos de Programación Orientada a Objetos. El sistema representa componentes ideales como resistencias, capacitores, inductores, interruptores y fuentes de voltaje DC mediante clases, permitiendo organizar el programa de manera modular y reutilizable.
+Este proyecto consiste en el desarrollo de una aplicación en Python llamada circuit simulator para simular circuitos eléctricos que contienen resistencias, capacitores e inductores en cualquier configuración, utilizando los conceptos de Programación Orientada a Objetos. El sistema representa componentes ideales como resistencias, capacitores, inductores, interruptores y fuentes de voltaje DC mediante clases, permitiendo organizar el programa de manera modular y reutilizable.
 
 La simulación se basa en las leyes de Kirchhoff y en la resolución numérica de ecuaciones diferenciales para analizar cómo cambian los voltajes y corrientes a lo largo del tiempo. Además, el programa permite el estudio del comportamiento transitorio de distintos circuitos eléctricos.
 
@@ -22,162 +22,182 @@ Desarrollar una aplicación en Python usando los conceptos de Programación Orie
 
 ## Lógica del programa:
 
-El simulador está estructurado en cinco módulos principales: componentes, circuitos, simulación y visualización. Cada módulo agrupa las clases responsables de una etapa específica del proceso, desde la definición del circuito hasta la generación de gráficas.
+El simulador está estructurado en cinco módulos principales: componentes, fuentes, circuitos, simulación y visualización. Cada módulo agrupa las clases responsables de una etapa específica del proceso, desde la definición del circuito hasta la generación de gráficas.
 
-El usuario comienza instanciando los componentes pasivos que conforman el circuito: resistencias, capacitores e inductores, junto con una fuente de tensión DC y un interruptor. Cada componente se crea con sus parámetros físicos (resistencia en ohms, capacitancia en faradios, etc.) y el interruptor define el instante en que el circuito se activa. Con estos objetos, el usuario instancia una topología predefinida, por ejemplo, RC en serie o RC en paralelo.
+El usuario comienza instanciando los componentes pasivos que conforman el circuito — resistencias, capacitores e inductores — junto con una fuente de tensión DC y un switch. Cada componente se crea con sus parámetros físicos (resistencia en ohms, capacitancia en faradios, etc.) y el switch define el instante en que el circuito se activa. 
 
-Una vez definido el circuito, se soluciona teniendo en cuenta la topología junto con los parámetros de simulación: tiempo final e intervalo de tiempo. Se construye internamente la matriz del sistema usando el método de Análisis Nodal Modificado (MNA), donde cada componente contribuye a la matriz según su naturaleza eléctrica. Para circuitos con capacitores o inductores, el sistema de ecuaciones se convierte en una ecuación diferencial ordinaria que se resuelve numéricamente paso a paso en el tiempo. Con ayuda de la librería `matplotlib` el resultado de la simulación se almacena conteniendo tiempo, voltaje y corriente para cada componente del circuito.
+Con estos objetos, el usuario es libre de instanciar cualquier topología. Además, se crearon unas clases que permiten instanciar ciertas topologías predefinida — por ejemplo RCSeries o RLCParallel — que internamente asigna los nodos a cada componente de forma automática, sin que el usuario tenga que numerarlos manualmente.
 
-Finalmente, guarda en formato PNG las figuras de las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
+Una vez definido el circuito, se crea un Solver al que se le pasa la topología junto con los parámetros de simulación: tiempo de inicio, tiempo final e intervalo de tiempo. El solver construye internamente la matriz del sistema usando el método de Análisis Nodal Modificado (MNA), donde cada componente contribuye a la matriz según su naturaleza eléctrica a través del método stamp(). Para circuitos con capacitores o inductores, el sistema de ecuaciones se convierte en una ecuación diferencial ordinaria que el solver resuelve numéricamente paso a paso en el tiempo usando scipy. El resultado de la simulación se almacena en un objeto SimResult, que contiene los vectores de tiempo, voltaje y corriente para cada componente del circuito.
+
+Finalmente, el Plotter recibe el SimResult y genera las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
 
 ## Diagrama de flujo:
 
 ``` mermaid
 
 classDiagram
-    class Component {
+    direction TB
+
+    class CircuitElement {
         <<abstract>>
-        +str name
-        +float voltage
-        +float current
-        +reset()* 
+        -int node_pos
+        -int node_neg
+        -str label
+        +stamp(G, b, nodes) void
+        +get_voltage(x, node_map) float
+        +get_current(x, node_map) float
     }
-    class VoltageSource {
-        +float source_voltage
-        +set_voltage(voltage)
-        +reset()
+
+    class Resistor {
+        -float resistance
+        +stamp(G, b, nodes) void
+        +get_current(x, node_map) float
+        +get_voltage(x, node_map) float
     }
+
+    class Capacitor {
+        -float capacitance
+        -float initial_voltage
+        +stamp(G, b, nodes, dt, Vp) void
+        +get_current(x, node_map) float
+        +get_voltage(x, node_map) float
+    }
+
+    class Inductor {
+        -float inductance
+        -float initial_current
+        -int current_var_idx
+        +stamp(G, b, nodes, dt, Ip) void
+        +get_current(x, node_map) float
+        +get_voltage(x, node_map) float
+    }
+
     class Switch {
-        +float t_close
+        -float t_close
         -bool _closed
         +is_closed(t) bool
-        +set_t_close(t_close)
-        +reset()
+        +stamp(G, b, nodes, t) void
+        +get_current(x, node_map) float
+        +get_voltage(x, node_map) float
     }
-    class Resistor {
-        +float resistance
-        +set_resistance(resistance)
-        +reset()
+
+    class Source {
+        <<abstract>>
+        -int node_pos
+        -int node_neg
+        -str label
+        -int current_var_idx
+        +stamp(G, b, nodes) void
+        +get_current(x) float
+        +get_voltage(x) float
     }
-    class Capacitor {
-        +float capacitance
-        +float initial_voltage
-        +set_capacitance(capacitance)
-        +set_initial_voltage(v0)
-        +reset()
+
+    class DCVoltageSource {
+        -float voltage
+        +stamp(G, b, nodes) void
+        +get_current(x) float
+        +get_voltage(x) float
     }
-    class Inductor {
-        +float inductance
-        +float initial_current
-        +set_inductance(inductance)
-        +set_initial_current(i0)
-        +reset()
+
+    class ACVoltageSource {
+        -float amplitude
+        -float frequency
+        -float phase
+        +stamp(G, b, nodes, t) void
+        +get_current(x) float
+        +get_voltage(t) float
     }
-    Component <|-- VoltageSource
-    Component <|-- Switch
-    Component <|-- Resistor
-    Component <|-- Capacitor
-    Component <|-- Inductor
 
     class BaseCircuit {
         <<abstract>>
-        +VoltageSource source
-        +Switch switch
-        +float t_end
-        +float dt
-        +ndarray time
-        -dict _results
-        +run()
-        +plot(output_dir, show) list
-        +set_time(t_end, dt)
-        #_get_passive_components()* list
-        #_derivatives(t, state, vs)* ndarray
-        #_state_to_component_values(t, state, vs)*
-        #_initial_state()* ndarray
-        #topology_name()* str
-        -_component_param_str(comp)$ str
+        -Source source
+        -Switch switch
+        -list~CircuitElement~ elements
+        -int node_count
+        -int ground_node
+        +_assign_nodes() void
+        +get_elements() list
+        +get_sources() list
     }
+
     class RCSeries {
-        +Resistor resistor
-        +Capacitor capacitor
-        +topology_name() str
-        #_initial_state() ndarray
-        #_derivatives(t, state, vs) ndarray
-        #_state_to_component_values(t, state, vs)
-        #_get_passive_components() list
+        +_assign_nodes() void
     }
+
     class RCParallel {
-        +Resistor resistor
-        +Capacitor capacitor
-        -float _RS
-        +topology_name() str
-        #_initial_state() ndarray
-        #_derivatives(t, state, vs) ndarray
-        #_state_to_component_values(t, state, vs)
-        #_get_passive_components() list
+        +_assign_nodes() void
     }
+
     class RLSeries {
-        +Resistor resistor
-        +Inductor inductor
-        +topology_name() str
-        #_initial_state() ndarray
-        #_derivatives(t, state, vs) ndarray
-        #_state_to_component_values(t, state, vs)
-        #_get_passive_components() list
+        +_assign_nodes() void
     }
+
     class RLParallel {
-        +Resistor resistor
-        +Inductor inductor
-        -float _RS
-        +topology_name() str
-        #_initial_state() ndarray
-        #_derivatives(t, state, vs) ndarray
-        #_state_to_component_values(t, state, vs)
-        #_get_passive_components() list
+        +_assign_nodes() void
     }
+
     class RLCSeries {
-        +Resistor resistor
-        +Inductor inductor
-        +Capacitor capacitor
-        +topology_name() str
-        #_initial_state() ndarray
-        #_derivatives(t, state, vs) ndarray
-        #_state_to_component_values(t, state, vs)
-        #_get_passive_components() list
+        +_assign_nodes() void
     }
+
     class RLCParallel {
-        +Resistor resistor
-        +Capacitor capacitor
-        +Inductor inductor
-        -float _RS
-        +topology_name() str
-        #_initial_state() ndarray
-        #_derivatives(t, state, vs) ndarray
-        #_state_to_component_values(t, state, vs)
-        #_get_passive_components() list
+        +_assign_nodes() void
     }
+
+    class Solver {
+        -BaseCircuit circuit
+        -float t_start
+        -float t_end
+        -float dt
+        +build_mna_matrix() tuple
+        +solve_dc() SimResult
+        +solve_transient() SimResult
+        +solve_ac() SimResult
+    }
+
+    class SimResult {
+        -ndarray time
+        -dict voltages
+        -dict currents
+        +to_dataframe() DataFrame
+        +summary() str
+    }
+
+    class Plotter {
+        -SimResult result
+        -str style
+        +plot_voltage() Figure
+        +plot_current() Figure
+        +plot_all() Figure
+        +plot_bode() Figure
+        +save(path) void
+    }
+
+    CircuitElement <|-- Resistor
+    CircuitElement <|-- Capacitor
+    CircuitElement <|-- Inductor
+    CircuitElement <|-- Switch
+
+    Source <|-- DCVoltageSource
+    Source <|-- ACVoltageSource
+
     BaseCircuit <|-- RCSeries
     BaseCircuit <|-- RCParallel
     BaseCircuit <|-- RLSeries
     BaseCircuit <|-- RLParallel
     BaseCircuit <|-- RLCSeries
     BaseCircuit <|-- RLCParallel
-    BaseCircuit o-- VoltageSource : source
-    BaseCircuit o-- Switch : switch
-    RCSeries o-- Resistor
-    RCSeries o-- Capacitor
-    RCParallel o-- Resistor
-    RCParallel o-- Capacitor
-    RLSeries o-- Resistor
-    RLSeries o-- Inductor
-    RLParallel o-- Resistor
-    RLParallel o-- Inductor
-    RLCSeries o-- Resistor
-    RLCSeries o-- Inductor
-    RLCSeries o-- Capacitor
-    RLCParallel o-- Resistor
-    RLCParallel o-- Capacitor
-    RLCParallel o-- Inductor
+
+    BaseCircuit *-- CircuitElement
+    BaseCircuit *-- Source
+    BaseCircuit *-- Switch
+
+    BaseCircuit ..> Solver
+    Solver ..> SimResult
+    BaseCircuit ..> Plotter
+    Plotter ..> SimResult
+
 ``` 
 
 ## Interfaz gráfica:
