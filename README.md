@@ -24,11 +24,11 @@ Desarrollar una aplicación en Python usando los conceptos de Programación Orie
 
 El simulador está estructurado en cinco módulos principales: componentes, fuentes, circuitos, simulación y visualización. Cada módulo agrupa las clases responsables de una etapa específica del proceso, desde la definición del circuito hasta la generación de gráficas.
 
-El usuario comienza instanciando los componentes pasivos que conforman el circuito — resistencias, capacitores e inductores — junto con una fuente de tensión DC y un switch. Cada componente se crea con sus parámetros físicos (resistencia en ohms, capacitancia en faradios, etc.) y el switch define el instante en que el circuito se activa. 
+El usuario comienza instanciando los componentes pasivos que conforman el circuito: resistencias, capacitores e inductores, junto con al menos una fuente de tensión DC y un switch. Cada componente se crea con sus parámetros físicos (resistencia en ohms, capacitancia en faradios, etc.) y el switch define el instante en que el circuito se activa. 
 
-Con estos objetos, el usuario es libre de instanciar cualquier topología. Además, se crearon unas clases que permiten instanciar ciertas topologías predefinida — por ejemplo RCSeries o RLCParallel — que internamente asigna los nodos a cada componente de forma automática, sin que el usuario tenga que numerarlos manualmente.
+Con estos objetos, el usuario es libre de instanciar cualquier topología. Además, se crearon unas clases que permiten instanciar ciertas topologías predefinida, por ejemplo: RCSeries o RLCParallel, que internamente asigna los nodos a cada componente de forma automática, sin que el usuario tenga que numerarlos manualmente.
 
-Una vez definido el circuito, se crea un Solver al que se le pasa la topología junto con los parámetros de simulación: tiempo de inicio, tiempo final e intervalo de tiempo. El solver construye internamente la matriz del sistema usando el método de Análisis Nodal Modificado (MNA), donde cada componente contribuye a la matriz según su naturaleza eléctrica a través del método stamp(). Para circuitos con capacitores o inductores, el sistema de ecuaciones se convierte en una ecuación diferencial ordinaria que el solver resuelve numéricamente paso a paso en el tiempo usando scipy. El resultado de la simulación se almacena en un objeto SimResult, que contiene los vectores de tiempo, voltaje y corriente para cada componente del circuito.
+Una vez definido el circuito, se crea un Solver al que se le pasa la topología junto con los parámetros de simulación: tiempo de inicio, tiempo final e intervalo de tiempo. El solver construye internamente la matriz del sistema usando el método de Análisis Nodal Modificado (MNA), donde cada componente contribuye a la matriz según su naturaleza eléctrica a través del método stamp(). Para circuitos con capacitores o inductores, el sistema de ecuaciones se convierte en una ecuación diferencial ordinaria que el solver resuelve numéricamente paso a paso en el tiempo usando scipy. El resultado de la simulación se almacena en unas listas SimResult, que contiene los vectores de tiempo, voltaje y corriente para cada componente del circuito.
 
 Finalmente, el Plotter recibe el SimResult y genera las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
 
@@ -191,12 +191,11 @@ classDiagram
 
     BaseCircuit *-- CircuitElement
     BaseCircuit *-- Source
-    BaseCircuit *-- Switch
 
     BaseCircuit ..> Solver
     Solver ..> SimResult
     BaseCircuit ..> Plotter
-    Plotter ..> SimResult
+    Plotter <.. SimResult
 
 ``` 
 
