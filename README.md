@@ -194,7 +194,6 @@ classDiagram
 
     BaseCircuit ..> Solver
     Solver ..> SimResult
-    BaseCircuit ..> Plotter
     Plotter <.. SimResult
 
 ``` 
