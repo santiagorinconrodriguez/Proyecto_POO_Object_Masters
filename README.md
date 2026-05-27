@@ -32,7 +32,7 @@ Una vez definido el circuito, se crea un Solver al que se le pasa la topología 
 
 Finalmente, el Plotter recibe el SimResult y genera las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
 
-## Diagrama de flujo:
+## Diagrama UML:
 
 ``` mermaid
 
@@ -201,6 +201,41 @@ classDiagram
 ``` 
 
 ## Interfaz gráfica:
+
+### Tkinter
+Ventajas:
+
+ - Hay mucha documentación y ejemplos.
+ - Es la más simple.
+
+Desventajas:
+
+ - Incrustar gráficas de matplotlib dentro de la ventana requiere código adicional.
+ - Visualmente es anticuada.
+
+### PyQt6
+Ventajas:
+
+ - Interfaz visual moderna.
+ - Integración nativa con matplotlib.
+
+Desventajas:
+
+ - Es la más compleja de aprender.
+
+### Streamlit
+Ventajas:
+
+ - Rápida de implementar.
+ - Las gráficas de matplotlib y plotly se integran de forma nativa.
+
+Desventajas:
+
+ - Corre en el navegador como una app web.
+ - Re-ejecuta todo el script en cada interacción
+
+
+
 
 # Autores:
 - [Brayan Santiago Rincón Rodríguez](https://github.com/santiagorinconrodriguez)
